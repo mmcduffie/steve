@@ -1,0 +1,61 @@
+Steve Manifesto
+
+To explain what Steve is, and why I created it, I am writing this manifesto. This will serve as both a form of informal language specification and also an explanation for those times when someone might be using this language and say: "Why did they make it work this way?", or: "Why doesn't this language have the features I'm used to?"
+
+Since I find it easier to write this way, I'm going to write this manifesto as a series of fake questions from a hypothetical person who is asking questions about Steve, and then I will answer my own questions.
+
+Q: What is Steve?
+
+A: Steve is a programming language that I designed to test the boundaries of how "object-oriented" (Meaning how many of the constructs in the language are objects, not in the sense that it uses classes.) a language can be. To this end, it is also a test of weather a language can have zero keywords, and almost everything else be an object. Also, the goal of Steve is to apply the concept of DRY (Don't repeat yourself) to language design. I was inspired by all of the places in programming languages where the designers seem to create multiple language constructs that do similar things. as an example, you can have objects that contain variables with values, or you can have a hash that contains key/value pairs. Isn't that really the same thing? Other than having a different list of methods that you can call on the objects, they are very similar. Steve is an attempt to boil down all of these common idioms in language design to a simple object model that can achieve almost anything that any other language can.
+
+Q: How is Steve implemented?
+
+A: The interpreter for Steve is written in Ruby, because it's the language I already know how to write in. Also, Ruby code is becoming more and more portable and faster all of the time. My goal is not to write a language with a super-fast VM, or it's own exception-handling mechanism, or lots of concurrency stuff, or have it implemented in assembly, or any other crazy stuff that sounds like hard work. Instead, My implementation hijacks as much or Ruby's plumbing as it can. The goal is not to reinvent the wheel or get trapped into the premature-optimization quagmire.
+
+Q: Where are my Arrays? Where are my Hashes?
+
+A: Before we answer your question, lets think about what Arrays and Hashes are. They have keys (or indices), which are identifiers for the elements in the array/hash and values for each of those identifiers. In many languages, like Ruby, these Arrays and Hashes are objects. So, couldn't we just make an object with this same type of data in it? Consider the following Ruby code:
+
+array = Object.new
+array.instance_variable_set(:@item_one, 14)
+array.instance_variable_set(:@item_two, 45)
+array.instance_variable_set(:@item_three, 32)
+array.instance_variable_set(:@item_four, 18)
+puts array.inspect   #=> "#<Object:0x401b3da8 @item_one=14, @item_four=18, @item_three=32, @item_two=45>"
+
+Is that not the same basic data that would be in an Array? Other than the fact that ruby wouldn't let us use numbers to identify each index (hence the addresses like "@item_one"), and the fact that it printed out the value of our Array in the wrong order, we're pretty close. Of course, we can't call any of Ruby's handy-dandy Array class instance methods on this data. 
+
+Q: So, wouldn't that mean that if our language didn't have a dedicated class for Array types, we would have to make methods for Arrays available on all objects?
+
+A: Yes. My hope is that people find useful applications for Array-type methods on other non-Array things. For example, imagine the 'each' method that we can call on Array objects in Ruby. Wouldn't it be cool if we could use 'each' to print out the value of every variable in a method? The idea is that generalizing these built-in methods on all objects, we can open up new unexpected uses for these tools.
+
+Q: OK, but what if I call a method that only makes sense on Array types on some other object? Like, say I call 'map' on a method. What happens then?
+
+A: The idea in these situations will be for Steve to fail in a graceful way. Sure, not every line in a method will be a key/value (variable/value) pair that map could do anything with, but it will work with the ones it can and ignore the rest.
+
+Q: OK wise guy, how would I build something like an array or a hash in Steve then?
+
+A: Like this:
+
+foo: [ 0:14 . 1:45 . 2:32 . 3:18 . ].
+
+Where is says 'foo' is the name of our new object. The colon after that is the assignment operator. This means that we are assigning what's in the brackets to the object 'foo'. Inside the brackets, our object has four attributes. They are identified by 0, 1, 2 and 3. This is just like the index values of an Array. After each identifier, there is an assignment operator that says that we are to set the value of the identifier (variable) to whatever is to the right of the operator. The periods mark the end of each statement. Or, you could write:
+
+foo: [ 14. 45. 32. 18. ].
+
+If Steve doesn't see an assignment operator, and there is only one value in a given statement, Steve assigns it to a numbered variable starting with zero. So, this code has the same result as the code above.
+
+Q: Yikes! All the periods! What if a value in my statement is a float? how will I make it so Steve doesn't think my decimal point is the end of a statement?
+
+A: I hate parentheses, so I decided to only allow their use in math-type stuff in Steve. So, for example, you could do something like:
+
+foo: (3 + 5)
+
+and the value of foo will be 8. That is, Steve takes whatever the value is of the math inside the parentheses and creates a number object with the result. This way, Steve cleanly separates math symbols like +, -, *, or = from interfering with our computer program. For too long, all of these CS graduates have been writing computer languaes that are like giant algebra equations. Computer programs shouldn't muddle up things like flow control and attribute assignment with Math. Since everything inside parentheses is assumed to be math stuff, you can use periods here and Steve won't think it's the end-of-statement character, like:
+
+foo: (2.5)
+
+Q: Why make me remember to do that for floats? That is so cumbersome! Why not just use a semicolon to end a statement like I can in Java?
+
+A: Don't say the 'J' word. Just kidding. Floats are a corner case. I like periods, because that's how we end a sentence in English. So, you'll have to deal with parentheses around floats.
+
