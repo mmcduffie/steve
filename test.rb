@@ -1,3 +1,7 @@
+require 'rubygems'
+require 'tree'
+require 'set'
+
 source = <<-eos
   [    []
      
@@ -6,6 +10,20 @@ source = <<-eos
        eos
        
 chars = source.split(//)
+
+$granted_ids = Set.new
+
+def create_node_id
+  old_length = $granted_ids.length
+  node_id = 1000000000 + rand(8999999999)
+  $granted_ids.add(node_id)
+  new_length = $granted_ids.length
+  if new_length > old_length
+    return node_id
+  else
+    create_node_id
+  end
+end
 
 $mem = []
 $stack_level = 0
@@ -23,5 +41,17 @@ chars.each_with_index do |c,i|
   test_char(c,i)
 end
 
-puts $mem.inspect
-puts $stack_level
+module Tree
+  class TreeNode
+    def initialize(content = nil)
+      @name = self.object_id
+      @content = content
+      self.set_as_root!
+      @children_hash = Hash.new
+      @children = []
+    end
+  end
+end
+
+root_node = Tree::TreeNode.new("Root")
+puts root_node.inspect
