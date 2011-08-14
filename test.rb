@@ -41,17 +41,21 @@ chars.each_with_index do |c,i|
   test_char(c,i)
 end
 
-module Tree
-  class TreeNode
-    def initialize(content = nil)
-      @name = self.object_id
-      @content = content
-      self.set_as_root!
-      @children_hash = Hash.new
-      @children = []
-    end
-  end
-end
+#module Tree
+#  class TreeNode
+#    def initialize(content = nil)
+#      @name = self.object_id
+#      @content = content
+#      self.set_as_root!
+#      @children_hash = Hash.new
+#      @children = []
+#    end
+#  end
+#end
 
 root_node = Tree::TreeNode.new("Root")
-puts root_node.inspect
+root_node << child1 = Tree::TreeNode.new("child1")
+root_node << child2 = Tree::TreeNode.new("child2")
+child1 << Tree::TreeNode.new("child3")
+child1 << Tree::TreeNode.new("child4")
+puts root_node.print_tree
