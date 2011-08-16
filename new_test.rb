@@ -1,4 +1,4 @@
-test = "[this is [ a test [of the]] emergency [ broadcast ] system]"
+test = "[11111[22222[33333333]]1111111[222222]111111]"
 test_chars = test.split(//)
 char_buffer = []
 test_chars.each do |char|
@@ -9,6 +9,7 @@ class TestObject
   attr_accessor :parent
   attr_accessor :children
   attr_accessor :stack_level
+  attr_accessor :value
 end
 
 $current_object = nil
@@ -21,8 +22,8 @@ def test_char(char,pos)
     $stack_level += 1
     obj = TestObject.new
     obj.stack_level = $stack_level
+    obj.value = ""
     $object_stack.push(obj)
-    print " [ #{obj.stack_level}"
     $current_object = obj
   elsif char =~ /\]/
     $stack_level -= 1
@@ -33,12 +34,15 @@ def test_char(char,pos)
         $current_object = parent
       end
     end
-    print " ] #{$current_object.stack_level}"
   else
-    print "#{$current_object.stack_level}"
+    $current_object.value << char
   end
 end
 
 test_chars.each_with_index do |char,pos|
   test_char(char,pos)
+end
+
+$object_stack.each do |test|
+  puts "#{test.stack_level}, \"#{test.value}\""
 end
