@@ -5,17 +5,37 @@ test_chars.each do |char|
   char_buffer.push(char)
 end
 
+class TestObject
+  attr_accessor :parent
+  attr_accessor :children
+  attr_accessor :stack_level
+end
+
 $current_object = nil
 $old_object = nil
+$stack_level = 0
+$object_stack = []
 
 def test_char(char,pos)
   if char =~ /\[/
-    $old_object = $current_object
-    $current_object = Object.new.object_id
-    puts " [ #{$current_object} "
+    $stack_level += 1
+    obj = TestObject.new
+    obj.stack_level = $stack_level
+    $object_stack.push(obj)
+    print " [ #{obj.stack_level}"
+    $current_object = obj
   elsif char =~ /\]/
-    $current_object = $old_object
-    puts " #{$old_object} ]"
+    $stack_level -= 1
+    parent = nil
+    $object_stack.each do |obj|
+      if obj.stack_level == $stack_level
+        parent = obj
+        $current_object = parent
+      end
+    end
+    print " ] #{$current_object.stack_level}"
+  else
+    print "#{$current_object.stack_level}"
   end
 end
 
