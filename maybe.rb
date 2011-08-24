@@ -1,18 +1,23 @@
 require 'rubygems'
 require 'tree'
 
-root_object = Object.new
+class SteveObject
+  attr_accessor :attributes
+  attr_accessor :values
+end
+
+root_object = SteveObject.new
 root_object_id = root_object.object_id
 $root = Tree::TreeNode.new("#{root_object_id}", "")
 
-basic_object = Object.new
+basic_object = SteveObject.new
 basic_object_id = basic_object.object_id
 $root << Tree::TreeNode.new("#{basic_object_id}", "")
 
 $current_object_id = $root["#{basic_object_id}"].name
 $current_object = $root["#{basic_object_id}"]
 
-test = "[111111[22222[33333333]]111111[4444444]1111111]"
+test = "[ test [ test: [ test ]] test: test test: [ test ] test ]"
 test_chars = test.split(//)
 char_buffer = []
 test_chars.each do |char|
@@ -23,9 +28,10 @@ char_buffer.each do |char|
   if char.match(/\[/)
     parent_id = $current_object_id
     parent = $root["#{$current_object_id}"]
-    object = Object.new
+    object = SteveObject.new
     object_id = object.object_id
     $current_object << Tree::TreeNode.new("#{object_id}", "")
+    $current_object.content = $current_object.content << ">#{object_id}"
     $root.each do |node|
       if node.name == object_id.to_s
         $current_object = node
@@ -40,5 +46,8 @@ char_buffer.each do |char|
 end
 
 $root.each do |node|
-  puts node.content
+  node_string = node.content
+  if node_string.match(/:/)
+    puts node_string.match(/(?<attribute>\w+)\s*:\s*(\w+|\>\w+)/).inspect
+  end
 end
