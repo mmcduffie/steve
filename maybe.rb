@@ -17,7 +17,7 @@ $root << Tree::TreeNode.new("#{basic_object_id}", "")
 $current_object_id = $root["#{basic_object_id}"].name
 $current_object = $root["#{basic_object_id}"]
 
-test = "[ test [ test: [ test ]] test: test test: [ test ] test ]"
+test = "[ test test test [ attr1: [ test ]. attr2: value2. ] test test test [ test ] test ]"
 test_chars = test.split(//)
 char_buffer = []
 test_chars.each do |char|
@@ -48,6 +48,14 @@ end
 $root.each do |node|
   node_string = node.content
   if node_string.match(/:/)
-    puts node_string.match(/(?<attribute>\w+)\s*:\s*(\w+|\>\w+)/).inspect
+    if node_string.match(/./)
+      statements = node_string.split(".")
+      statements.each do |statement|
+        match = statement.match(/(?<attribute>\w+)\s*:\s*(?<value>(\w+|\>\w+))/)
+        unless match.nil?
+          puts "In node: #{node.name} Attribute: #{match[:attribute]} Value: #{match[:value]}"
+        end
+      end
+    end
   end
 end
