@@ -19,7 +19,8 @@ $root << Tree::TreeNode.new("#{basic_object_id}", "")
 $current_object_id = $root["#{basic_object_id}"].name
 $current_object = $root["#{basic_object_id}"]
 
-test = "[ test test test [ attr1: [ test ]. attr2: value2. ] test: test. test: [ test ] test ]"
+#test = "[ test test test [ attr1: [ test ]. attr2: value2. ] test: test. test: [ test ] test ]"
+test = "[1.2.3.]"
 test_chars = test.split(//)
 char_buffer = []
 test_chars.each do |char|
@@ -52,6 +53,7 @@ end
 
 $root.each do |node|
   node_string = node.content
+  auto_number = 0
   if node_string.match(/:/)
     if node_string.match(/./)
       statements = node_string.split(".")
@@ -71,5 +73,25 @@ $root.each do |node|
         end
       end
     end
+  else
+    statements = node_string.split(".")
+	statements.each do |statement|
+	  auto_number += 1
+	  match = statement.match(/\w+/)
+	  unless match.nil?
+        obj_id = node.name.to_i
+        steve_object = nil
+        $object_store.each do |obj|
+          if obj.object_id == obj_id
+            steve_object = obj
+          end
+        end
+		unless steve_object.nil?
+		  steve_object.attributes.push(auto_number)
+          steve_object.values.push(match[0])
+		  puts steve_object.inspect
+		end
+      end
+	end
   end
 end
