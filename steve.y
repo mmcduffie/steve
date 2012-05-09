@@ -22,26 +22,14 @@ main()
 %token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT ASSIGN STRING IDENTIFIER
 
 %%
-commands:
-        | commands command
+root:	  /* empty */
+        | root object
         ;
 
-command:
-        handle_o
-        |
-        others
-        ;
+object:	  OPEN_OBJECT CLOSE_OBJECT
+	| OPEN_OBJECT slot CLOSE_OBJECT
+	;
 
-handle_o:
-        OPEN_OBJECT CLOSE_OBJECT
-        {
-                printf("\tObject opened or closed\n");
-        }
-        ;
-
-others:
-        EXEC_OBJECT ASSIGN STRING IDENTIFIER
-        {
-                printf("\tEXEC_OBJECT, ASSIGN, STRING, or IDENTIFIER called\n");
-        }
-        ;
+slot:	  IDENTIFIER ASSIGN object
+	| slot object
+	;
