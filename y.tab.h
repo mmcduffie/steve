@@ -41,9 +41,10 @@
      OPEN_OBJECT = 258,
      CLOSE_OBJECT = 259,
      EXEC_OBJECT = 260,
-     ASSIGN = 261,
-     STRING = 262,
-     IDENTIFIER = 263
+     MATH = 261,
+     ASSIGN = 262,
+     STRING = 263,
+     IDENTIFIER = 264
    };
 #endif
 

@@ -19,17 +19,21 @@ main()
 
 %}
 
-%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT ASSIGN STRING IDENTIFIER
+%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT MATH ASSIGN STRING IDENTIFIER
 
 %%
-root:	  /* empty */
-        | root object
-        ;
+
+objects:  /* empty */
+	| objects object
+	;
 
 object:	  OPEN_OBJECT CLOSE_OBJECT
 	| OPEN_OBJECT slot CLOSE_OBJECT
 	;
 
 slot:	  IDENTIFIER ASSIGN object
-	| slot object
+	| IDENTIFIER ASSIGN IDENTIFIER
+	| IDENTIFIER ASSIGN STRING
+	| IDENTIFIER ASSIGN MATH
+	| IDENTIFIER ASSIGN EXEC_OBJECT object
 	;

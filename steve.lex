@@ -8,6 +8,7 @@
 \]                      return CLOSE_OBJECT;
 >                       return EXEC_OBJECT;
 :                       return ASSIGN;
-L?\"(\\.|[^\\"])*\"     return STRING;
+\"(\\.|[^\\"])*\"       return STRING;
+\((\\.|[^\\)])*\)	return MATH;
 [a-z|A-Z|0-9]+          return IDENTIFIER;
 %%
