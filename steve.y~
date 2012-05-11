@@ -19,28 +19,26 @@ main()
 
 %}
 
-%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT ASSIGN STRING IDENTIFIER
+%union {
+  char * string;
+}
 
-commands:
-        | commands command
-        ;
+%token <string> STRING
+%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT MATH ASSIGN IDENTIFIER
 
-command:
-        handle_o
-        |
-        others
-        ;
+%%
 
-handle_o:
-        OPEN_OBJECT CLOSE_OBJECT
-        {
-                printf("\tObject opened or closed\n");
-        }
-        ;
+objects:  /* empty */
+	| objects object
+	;
 
-others:
-        EXEC_OBJECT ASSIGN STRING IDENTIFIER
-        {
-                printf("\tEXEC_OBJECT, ASSIGN, STRING, or IDENTIFIER called\n");
-        }
-        ;
+object:	  OPEN_OBJECT CLOSE_OBJECT
+	| OPEN_OBJECT slot CLOSE_OBJECT
+	;
+
+slot:	  IDENTIFIER ASSIGN object
+	| IDENTIFIER ASSIGN IDENTIFIER
+	| IDENTIFIER ASSIGN STRING
+	| IDENTIFIER ASSIGN MATH
+	| IDENTIFIER ASSIGN EXEC_OBJECT object
+	;

@@ -19,7 +19,12 @@ main()
 
 %}
 
-%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT MATH ASSIGN STRING IDENTIFIER
+%union {
+  char * string;
+}
+
+%token <string> STRING
+%token OPEN_OBJECT CLOSE_OBJECT EXEC_OBJECT MATH ASSIGN IDENTIFIER
 
 %%
 
