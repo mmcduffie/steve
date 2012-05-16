@@ -10,6 +10,14 @@ class Lexer
   end
   def scan(source_string)
     if source_string == ""
+      if @lexer_stack.length > 0
+        error_string = ""
+        @lexer_stack.each do |char|
+          error_string << char
+          break if error_string.length > 3
+        end
+        raise SyntaxError, "Error lexing: Input not recognized by Steve. Error occurs here:\n#{error_string}\n^"
+      end
       return @result_stack
     end
     @lexer_stack.push(source_string.slice!(0)) #push one char onto stack
@@ -40,5 +48,15 @@ class LexerTest < Test::Unit::TestCase
   def test_complicated_scan
     tokens = @lexer.scan 'foo "foo bar"'
     assert_equal [{ "foo" => "foo" },{ "string" => "\"foo bar\"" }], tokens, "Token array returned from scan is not what we expected."
+  end
+  def test_single_char_tokens
+    @lexer = Lexer.new({ "OPEN_OBJECT" => /\[/ , "foo" => /foo/ , "CLOSE_OBJECT" => /\]/ })
+    tokens = @lexer.scan "[[foo] [ ] ]"
+    assert_equal [{ "OPEN_OBJECT" => "[" },{ "OPEN_OBJECT" => "[" },{ "foo" => "foo" },{ "CLOSE_OBJECT" => "]" },{ "OPEN_OBJECT" => "[" },{ "CLOSE_OBJECT" => "]" },{ "CLOSE_OBJECT" => "]" }], tokens, "Token array returned from scan is not what we expected."
+  end
+  def test_lexing_error
+    assert_raise SyntaxError do
+      @lexer.scan "foo baz bar"
+    end
   end
 end
