@@ -46,8 +46,10 @@ module Steve
       return result
     end
     def reduce
-      if find(@input_tokens[0].keys[0])
-        return if find(@input_tokens[0].keys[0]).root?
+      unless @input_tokens.empty?
+        if find(@input_tokens[0].keys[0])
+          return if find(@input_tokens[0].keys[0]).root?
+        end
       end
       @parser_stack.push @input_tokens.pop #on each pass, we take a token from the input stack, and push it onto the parser stack
       names = []
@@ -84,5 +86,16 @@ class ParserTest < Test::Unit::TestCase
     parser.input_tokens = [{ "BAR" => "bar" },{ "BAR" => "bar" }]
     parser.reduce
     assert_equal [{"GROUP"=>[{ "BAR" => "bar" },{ "BAR" => "bar" }]}], parser.input_tokens, "Reduction did not occur properly."
+  end
+  def test_more_complex_reduce
+    root_symbol = Steve::Symbol.new("ROOT",true)
+    root_symbol.add_component(["FOO","FOO"])
+    mid_symbol = Steve::Symbol.new("FOO",false)
+    mid_symbol.add_component(["BAR","BAR"])
+    mid_symbol.add_component(["BAR","BAR","BAR"])
+    term_symbol = Steve::Symbol.new("BAR",false)
+    parser = Steve::Parser.new([root_symbol,mid_symbol,term_symbol])
+    parser.input_tokens = [{ "BAR" => "bar" },{ "BAR" => "bar" },{ "BAR" => "bar" },{ "BAR" => "bar" }]
+    #parser.reduce
   end
 end
