@@ -12,9 +12,14 @@ module Steve
   class Symbol
     attr_accessor :name
     attr_accessor :components
-    def initialize(name)
+    attr_accessor :root
+    def initialize(name,root)
       @name = name
+      @root = root
       @components = []
+    end
+    def root?
+      return true if @root == true
     end
     def add_component(component_rules)
       @components.push component_rules
@@ -30,20 +35,29 @@ module Steve
     def initialize(grammar_rules)
       @grammar_rules = grammar_rules
       @parser_stack = []
-      @temp_counter = 0
+    end
+    def find(token)
+      result = false
+      @grammar_rules.each do |rule|
+        if rule.name == token
+          result = rule
+        end
+      end
+      return result
     end
     def reduce
-      return if @temp_counter == 2
-      @temp_counter = @temp_counter + 1
+      if find(@input_tokens[0].keys[0])
+        return if find(@input_tokens[0].keys[0]).root?
+      end
       @parser_stack.push @input_tokens.pop #on each pass, we take a token from the input stack, and push it onto the parser stack
       names = []
       @parser_stack.each do |token|
         names.push token.keys[0] #get the names of the tokens in the parser stack
       end
-      @grammar_rules.each do |rule|
+      @grammar_rules.each_with_index do |rule,symbol|
         rule.components.each do |component|
           if names == component #compare the names of the tokes currently in the stack to our rule components
-            puts "reduce!"
+            @input_tokens.push Hash[@grammar_rules[symbol].name, @parser_stack] #if there is a match, put the reduced token back in
           end
         end
       end
@@ -54,14 +68,21 @@ end
 
 class ParserTest < Test::Unit::TestCase
   def test_add_component_to_symbol
-    symbol = Steve::Symbol.new("FOO")
+    symbol = Steve::Symbol.new("FOO",false)
     assert_equal [["BAR","BAR"]], symbol.add_component(["BAR","BAR"]), "Added Symbol components not properly added."
   end
+  def test_find_token
+    symbol = Steve::Symbol.new("GROUP",true)
+    symbol.add_component(["BAR","BAR"])
+    parser = Steve::Parser.new([symbol])
+    assert_equal "GROUP", parser.find("GROUP").name, "Find did not return the proper Symbol object."
+  end
   def test_reduce
-    symbol = Steve::Symbol.new("GROUP")
+    symbol = Steve::Symbol.new("GROUP",true)
     symbol.add_component(["BAR","BAR"])
     parser = Steve::Parser.new([symbol])
     parser.input_tokens = [{ "BAR" => "bar" },{ "BAR" => "bar" }]
     parser.reduce
+    assert_equal [{"GROUP"=>[{ "BAR" => "bar" },{ "BAR" => "bar" }]}], parser.input_tokens, "Reduction did not occur properly."
   end
 end
