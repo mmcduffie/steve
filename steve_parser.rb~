@@ -95,6 +95,6 @@ class ParserTest < Test::Unit::TestCase
       { "name" => "BAR", "value" => "bar", "root" => false },
       { "name" => "BAR", "value" => "bar", "root" => false }
     ]
-    #parser.reduce
+    parser.reduce
   end
 end
