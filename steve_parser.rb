@@ -43,7 +43,8 @@ module Steve
         return @input_tokens if @input_tokens[0]["root"] == true #base case, as our goal is to reduce to one root
       end
       unless @input_tokens.empty?
-        @parser_stack.push @input_tokens.slice!(0) #on each pass, we take a token from the input stack, and push it onto the parser stack
+        #on each pass, we take a token from the input stack, and push it onto the parser stack
+        @parser_stack.push @input_tokens.slice!(0)
       end
       names = []
       @parser_stack.each do |token|
