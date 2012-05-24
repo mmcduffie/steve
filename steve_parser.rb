@@ -19,7 +19,7 @@ module Steve
       @components = []
     end
     def root?
-      return true if @root == true
+      @root
     end
     def add_component(component_rules)
       @components.push component_rules
@@ -40,9 +40,11 @@ module Steve
     end
     def reduce
       unless @input_tokens.empty?
-        return if @input_tokens[0]["root"] == true #base case, as our goal is to reduce to one root
+        return @input_tokens if @input_tokens[0]["root"] == true #base case, as our goal is to reduce to one root
       end
-      @parser_stack.push @input_tokens.pop #on each pass, we take a token from the input stack, and push it onto the parser stack
+      unless @input_tokens.empty?
+        @parser_stack.push @input_tokens.slice!(0) #on each pass, we take a token from the input stack, and push it onto the parser stack
+      end
       names = []
       @parser_stack.each do |token|
         names.push token["name"] #get the names of the tokens in the parser stack
@@ -53,6 +55,7 @@ module Steve
             name = @grammar_rules[symbol].name
             root = @grammar_rules[symbol].root?
             reduced_token = { "name" => name, "value" => @parser_stack, "root" => root }
+            @parser_stack = []
             @input_tokens.push reduced_token #if there is a match, put the reduced token back in
           end
         end
@@ -75,26 +78,45 @@ class ParserTest < Test::Unit::TestCase
       { "name" => "BAR", "value" => "bar", "root" => false },
       { "name" => "BAR", "value" => "bar", "root" => false }
     ]
-    parser.reduce
     assert_equal [
       { "name" => "GROUP", "value" => [
         { "name" => "BAR", "value" => "bar", "root" => false },
         { "name" => "BAR", "value" => "bar", "root" => false }
       ], "root" => true}
-    ], parser.input_tokens, "Reduction did not occur properly."
+    ], parser.reduce, "Reduction did not occur properly."
   end
   def test_more_complex_reduce
     root_symbol = Steve::Symbol.new("ROOT",true)
-    root_symbol.add_component(["FOO","FOO"])
-    mid_symbol = Steve::Symbol.new("FOO",false)
-    mid_symbol.add_component(["BAR","BAR","BAR"])
-    term_symbol = Steve::Symbol.new("BAR",false)
-    parser = Steve::Parser.new([root_symbol,mid_symbol,term_symbol])
+    root_symbol.add_component(["FOO","BAZ"])
+    mid_symbol_1 = Steve::Symbol.new("FOO",false)
+    mid_symbol_1.add_component(["BAR","BAR","BAR"])
+    mid_symbol_2 = Steve::Symbol.new("BAZ",false)
+    mid_symbol_2.add_component(["FIZZ","BUZZ","FIZZ"])
+    term_symbol_1 = Steve::Symbol.new("BAR",false)
+    term_symbol_2 = Steve::Symbol.new("FIZZ",false)
+    term_symbol_3 = Steve::Symbol.new("BUZZ",false)
+    parser = Steve::Parser.new([root_symbol,mid_symbol_1,mid_symbol_2,term_symbol_1,term_symbol_2,term_symbol_3])
     parser.input_tokens = [
       { "name" => "BAR", "value" => "bar", "root" => false },
       { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false }
+      { "name" => "BAR", "value" => "bar", "root" => false },
+      { "name" => "FIZZ", "value" => "fizz", "root" => false },
+      { "name" => "BUZZ", "value" => "buzz", "root" => false },
+      { "name" => "FIZZ", "value" => "fizz", "root" => false }
     ]
-    #parser.reduce
+    assert_equal [
+      { "name" => "ROOT", "value" => [
+        { "name" => "FOO", "value" => [
+          { "name" => "BAR", "value" => "bar", "root" => false },
+          { "name" => "BAR", "value" => "bar", "root" => false },
+          { "name" => "BAR", "value" => "bar", "root" => false }
+        ], "root" => false},
+        { "name" => "BAZ", "value" => [
+          { "name" => "FIZZ", "value" => "fizz", "root" => false },
+          { "name" => "BUZZ", "value" => "buzz", "root" => false },
+          { "name" => "FIZZ", "value" => "fizz", "root" => false }
+        ], "root" => false}
+      ], "root" => true}
+    ], parser.reduce, "Reduction did not occur properly."
   end
 end
