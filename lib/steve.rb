@@ -8,6 +8,8 @@ module Steve
   autoload :Lexer, "steve/lexer"
   autoload :Parser, "steve/parser"
   autoload :Symbol, "steve/symbol"
+  autoload :Interpreter, "steve/interpreter"
+  autoload :MathExpression, "steve/math_expression"
 
   # This is the main exec for Steve. This should get called weather we
   # are invoking Steve from the command line after insalling as a gem or 

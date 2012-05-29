@@ -15,7 +15,7 @@ class ParserTest < Test::Unit::TestCase
       { "name" => "GROUP", "value" => [
         { "name" => "BAR", "value" => "bar", "root" => false },
         { "name" => "BAR", "value" => "bar", "root" => false }
-      ], "root" => true}
+      ], "root" => true }
     ], parser.reduce, "Reduction did not occur properly."
   end
   def test_more_complex_reduce
@@ -65,13 +65,13 @@ class ParserTest < Test::Unit::TestCase
           { "name" => "BAR", "value" => "bar", "root" => false },
           { "name" => "BAR", "value" => "bar", "root" => false },
           { "name" => "BAR", "value" => "bar", "root" => false }
-        ], "root" => false},
+        ], "root" => false },
         { "name" => "BAZ", "value" => [
           { "name" => "FIZZ", "value" => "fizz", "root" => false },
           { "name" => "BUZZ", "value" => "buzz", "root" => false },
           { "name" => "FIZZ", "value" => "fizz", "root" => false }
-        ], "root" => false}
-      ], "root" => true}
+        ], "root" => false }
+      ], "root" => true }
     ], parser.reduce, "Reduction did not occur properly."
   end
 end
