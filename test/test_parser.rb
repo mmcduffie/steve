@@ -90,29 +90,40 @@ class ParserTest < Test::Unit::TestCase
     root_symbol.stubs(:root?).returns(true)
 
     recursive_symbol = mock
-    recursive_symbol.stubs(:components).returns([[]])
+    recursive_symbol.stubs(:components).returns([["BAR","BAR"]])
     recursive_symbol.stubs(:recursive_components).returns([[]])
     recursive_symbol.stubs(:name).returns("FOO")
     recursive_symbol.stubs(:root?).returns(false)
 
-    parser = Steve::Parser.new([root_symbol,recursive_symbol])
+    non_recursive_symbol = mock
+    non_recursive_symbol.stubs(:components).returns([[]])
+    non_recursive_symbol.stubs(:recursive_components).returns([[]])
+    non_recursive_symbol.stubs(:name).returns("BAR")
+    non_recursive_symbol.stubs(:root?).returns(false)
+
+    parser = Steve::Parser.new([root_symbol,recursive_symbol,non_recursive_symbol])
     parser.input_tokens = [
       { "name" => "FOO", "value" => "foo", "root" => false },
       { "name" => "FOO", "value" => "foo", "root" => false },
       { "name" => "FOO", "value" => "foo", "root" => false },
       { "name" => "FOO", "value" => "foo", "root" => false },
       { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false }
+      { "name" => "FOO", "value" => "foo", "root" => false },
+      { "name" => "BAR", "value" => "bar", "root" => false },
+      { "name" => "BAR", "value" => "bar", "root" => false }
     ]
-    #assert_equal [
-    #  { "name" => "ROOT", "value" => [
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false }
-    #  ], "root" => true }
-    #], parser.reduce, "Reduction did not occur properly."
+    assert_equal [
+      { "name" => "ROOT", "value" => [
+        { "name" => "FOO", "value" => "foo", "root" => false },
+        { "name" => "FOO", "value" => "foo", "root" => false },
+        { "name" => "FOO", "value" => "foo", "root" => false },
+        { "name" => "FOO", "value" => "foo", "root" => false },
+        { "name" => "FOO", "value" => "foo", "root" => false },
+        { "name" => "FOO", "value" => [
+          { "name" => "BAR", "value" => "bar", "root" => false },
+          { "name" => "BAR", "value" => "bar", "root" => false }
+        ], "root" => false }
+      ], "root" => true }
+    ], parser.reduce, "Reduction did not occur properly."
   end
 end
