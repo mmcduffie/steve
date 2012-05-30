@@ -14,12 +14,16 @@ module Steve
       @name = name
       @root = root
       @components = []
+      @recursive_components = []
     end
     def root?
       @root
     end
     def add_component(component_rules)
       @components.push component_rules
+    end
+    def add_recursive_component(component)
+      @recursive_components.push component
     end
   end
 end

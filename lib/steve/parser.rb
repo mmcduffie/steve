@@ -34,7 +34,15 @@ module Steve
             @input_tokens.push reduced_token #if there is a match, put the reduced token back in
           end
         end
+        rule.recursive_components.each do |component|
+          
+        end
       end
+
+      #puts "\n"
+      #puts "I:#{@input_tokens.length} P:#{@parser_stack.length} N:#{names.length}"
+      #puts "\n"
+
       reduce
     end
   end
