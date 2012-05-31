@@ -16,5 +16,9 @@ module Steve
       @parser_stack = []
       @input_tokens.push reduced_token
     end
+    def parse
+      @lookahead_token = @input_tokens.shift
+      puts @lookahead_token.inspect
+    end
   end
 end

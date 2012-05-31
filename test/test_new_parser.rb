@@ -32,4 +32,23 @@ class NewParserTest < Test::Unit::TestCase
       ], "root" => true }
     ], parser.input_tokens, "Reduction did not happen as we expected."
   end
+  def test_simple_parse
+    symbol = mock
+    symbol.stubs(:components).returns([["BAR","BAR"]])
+    symbol.stubs(:recursive_components).returns([[]])
+    symbol.stubs(:name).returns("GROUP")
+    symbol.stubs(:root?).returns(true)
+
+    parser = Steve::NewParser.new [symbol], [
+      { "name" => "BAR", "value" => "bar", "root" => false },
+      { "name" => "BAR", "value" => "bar", "root" => false }
+    ]
+
+    assert_equal [
+      { "name" => "GROUP", "value" => [
+        { "name" => "BAR", "value" => "bar", "root" => false },
+        { "name" => "BAR", "value" => "bar", "root" => false }
+      ], "root" => true }
+    ], parser.parse, "Parse did not occur properly."
+  end
 end
