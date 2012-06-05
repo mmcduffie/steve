@@ -8,7 +8,6 @@ module Steve
   autoload :Lexer, "steve/lexer"
   autoload :Parser, "steve/parser"
   autoload :Symbol, "steve/symbol"
-  autoload :Token, "steve/token"
   autoload :Interpreter, "steve/interpreter"
   autoload :MathExpression, "steve/math_expression"
   autoload :NewParser, "steve/new_parser"
