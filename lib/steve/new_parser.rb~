@@ -18,6 +18,7 @@ module Steve
     end
     def parse
       @lookahead_token = @input_tokens.shift
+      puts @lookahead_token
     end
   end
 end

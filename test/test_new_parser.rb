@@ -27,21 +27,17 @@ class NewParserTest < Test::Unit::TestCase
     token_2 = Steve::Token.new "FOO", "foo", false
 
     root_token = Steve::Token.new "ROOT", [
-      token1,
-      token2
+      token_1,
+      token_2
     ], true
 
     parser.parser_stack = [
       token_1,
       token_2
     ]
+
     parser.reduce "ROOT", true
-    assert_equal [
-      { "name" => "ROOT", "value" => [
-        { "name" => "FOO", "value" => "foo", "root" => false },
-        { "name" => "FOO", "value" => "foo", "root" => false }
-      ], "root" => true }
-    ], parser.input_tokens, "Reduction did not happen as we expected."
+    assert_equal [root_token], parser.input_tokens, "Reduction did not happen as we expected."
   end
   def test_simple_parse
     symbol = mock
@@ -63,6 +59,6 @@ class NewParserTest < Test::Unit::TestCase
       token2
     ]
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
 end
