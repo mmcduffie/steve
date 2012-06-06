@@ -40,7 +40,10 @@ class NewParserTest < Test::Unit::TestCase
     assert_equal [root_token], parser.input_tokens, "Reduction did not happen as we expected."
   end
   def test_match
-    symbol = Steve::Token.new "GROUP", "", true, ["BAR","BAR"], []
+    symbol_component1 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component2 = Steve::Token.new "BAR", "bar", false, [], []
+
+    symbol = Steve::Token.new "GROUP", "", true, [symbol_component1,symbol_component2], []
 
     token1 = Steve::Token.new "BAR", "bar", false, [], []
     token2 = Steve::Token.new "BAR", "bar", false, [], []
@@ -52,7 +55,7 @@ class NewParserTest < Test::Unit::TestCase
 
     parser = Steve::NewParser.new [symbol], []
 
-    assert_equal "GROUP", parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
+    assert_equal symbol, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
   end
   def test_simple_parse
     symbol = mock
@@ -74,6 +77,6 @@ class NewParserTest < Test::Unit::TestCase
       token2
     ]
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
 end

@@ -17,9 +17,18 @@ module Steve
       @input_tokens.push reduced_token
     end
     def match(stack)
-      
+      @grammar_rules.each do |rule|
+        if stack == rule.components
+          return rule
+        else
+          return false
+        end
+      end
     end
     def parse
+      if @input_tokens.length == 1 && @input_tokens[0].root
+        return @input_tokens
+      end
       # If there is no lookahead token yet, get one.
       if @lookahead_token.nil?
         @lookahead_token = @input_tokens.shift
@@ -27,6 +36,16 @@ module Steve
       # Create an array of tokens that includes the lookahead token.
       comparison_stack = @parser_stack
       comparison_stack.push @lookahead_token
+      # Try to match using the lookahead token.
+      match_result = match(comparison_stack)
+      if match_result
+        shift
+        reduce match_result.name, match_result.root
+      end
+      # If no match, shift another token.
+      shift
+      # Recursively call parse another time.
+      parse
     end
   end
 end
