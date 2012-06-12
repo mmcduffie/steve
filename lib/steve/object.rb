@@ -14,7 +14,13 @@ module Steve
       end
     end
   end
-
+  #
+  # Objects are the main building block of any Steve program. They consist of
+  # slots that can be created and have their values changed, but never have their
+  # names changed or be deleted entirely, because that might change the external
+  # interface of the object. To crate a get a similar object with fewer slots one 
+  # must first create a new object and then copy values from the old one.
+  #
   class Object
     attr_accessor :ids
     attr_accessor :keys
@@ -56,6 +62,15 @@ module Steve
         @values[index] = value
       else
         raise RuntimeError, "Cannot set value on a slot (#{id}) that doesn't exist."
+      end
+      return id
+    end
+    def set_name_at_id(id,name)
+      index = id - 1
+      if @ids[index]
+        @keys[index] = name
+      else
+        raise RuntimeError, "Cannot set name on a slot (#{id}) that doesn't exist."
       end
       return id
     end

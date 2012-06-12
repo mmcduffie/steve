@@ -64,4 +64,11 @@ class SteveObjectTest < Test::Unit::TestCase
       slot_with_new_value = object.set_value_at_id(2,"new_value")
     end
   end
+  def test_set_name_at_id
+    object = Steve::Object.new
+    object.add_slot
+    slot_with_new_name = object.set_name_at_id(1,"foo")
+    found_slot = object.find_slot_by_id(slot_with_new_name)
+    assert_equal "foo", found_slot.name, "Slot should have the name we set."
+  end
 end
