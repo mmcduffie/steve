@@ -12,6 +12,8 @@ module Steve
   autoload :Interpreter, "steve/interpreter"
   autoload :MathExpression, "steve/math_expression"
   autoload :NewParser, "steve/new_parser"
+  autoload :Object, "steve/object"
+  autoload :Slot, "steve/object"
 
   # This is the main exec for Steve. This should get called weather we
   # are invoking Steve from the command line after insalling as a gem or 
