@@ -136,4 +136,25 @@ class ParserTest < Test::Unit::TestCase
 
     assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
+  def test_parse_with_recursive_rules
+    symbol_component = Steve::Token.new "BAR", "bar", false, [], []
+
+    symbol = Steve::Token.new "ROOT", "", true, [], [symbol_component]
+
+    token = Steve::Token.new "BAR", "bar", false, [], []
+
+    root_token = Steve::Token.new "ROOT", [
+      token,
+      token,
+      token
+    ], true, [], []
+
+    parser = Steve::Parser.new [symbol], [
+      token,
+      token,
+      token
+    ]
+
+    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+  end
 end
