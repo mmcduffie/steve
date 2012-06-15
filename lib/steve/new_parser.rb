@@ -21,25 +21,34 @@ module Steve
       @grammar_rules.each do |rule|
         if stack == rule.components
           return rule
-        else
-          return false
         end
       end
+      return false
+    end
+    def finished?
+      if @input_tokens.length == 1 && @input_tokens[0].root
+        return true
+      else
+        return false
+      end
+    end
+    def abstract_syntax_tree
+      return @input_tokens[0]
     end
     def parse
-      if @input_tokens.length == 1 && @input_tokens[0].root
-        return @input_tokens[0]
+      if finished?
+        return abstract_syntax_tree
       end
       shift
-      stack_with_lookahead = @parser_stack
-      stack_with_lookahead.push @input_tokens.last
-      lookahead_match = match stack_with_lookahead
-      if lookahead_match
-        shift
-        reduce lookahead_match.name, lookahead_match.root
-      else
-        match = match @parser_stack
-        if match
+      match = match @parser_stack
+      if match
+        lookahead_match = false
+        unless @input_tokens.empty?
+          lookahead = @input_tokens.last
+          lookahead_stack = @parser_stack + [lookahead]
+          lookahead_match = match lookahead_stack
+        end
+        unless lookahead_match
           reduce match.name, match.root
         end
       end

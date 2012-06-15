@@ -58,6 +58,33 @@ class NewParserTest < Test::Unit::TestCase
 
     assert_equal symbol, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
   end
+  def test_another_match
+    symbol_component1 = Steve::Token.new "BAZ", "baz", false, [], []
+    symbol_component2 = Steve::Token.new "BAZ", "baz", false, [], []
+    symbol_component3 = Steve::Token.new "BAZ", "baz", false, [], []
+
+    symbol_1 = Steve::Token.new "GROUP", "", false, [symbol_component1,symbol_component2,symbol_component3], []
+
+    symbol_component4 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component5 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component6 = Steve::Token.new "FOO", "foo", false, [], []
+
+    symbol_2 = Steve::Token.new "ROOT", "", true, [symbol_component4,symbol_component5,symbol_component6], []
+
+    token1 = Steve::Token.new "BAR", "bar", false, [], []
+    token2 = Steve::Token.new "BAR", "bar", false, [], []
+    token3 = Steve::Token.new "FOO", "foo", false, [], []
+
+    parser_stack = [
+      token1,
+      token2,
+      token3
+    ]
+
+    parser = Steve::NewParser.new [symbol_1,symbol_2], []
+
+    assert_equal symbol_2, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
+  end
   def test_simple_parse
     symbol_component1 = Steve::Token.new "BAR", "bar", false, [], []
     symbol_component2 = Steve::Token.new "BAR", "bar", false, [], []
@@ -107,6 +134,6 @@ class NewParserTest < Test::Unit::TestCase
       token3
     ]
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
 end
