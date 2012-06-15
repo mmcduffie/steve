@@ -11,7 +11,6 @@ module Steve
   autoload :Token, "steve/token"
   autoload :Interpreter, "steve/interpreter"
   autoload :MathExpression, "steve/math_expression"
-  autoload :NewParser, "steve/new_parser"
   autoload :Object, "steve/object"
   autoload :Slot, "steve/object"
 

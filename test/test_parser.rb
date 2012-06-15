@@ -1,129 +1,139 @@
 require 'helper'
 
 class ParserTest < Test::Unit::TestCase
+  def test_shift
+    parser = Steve::Parser.new [], []
+    test_token = Steve::Token.new "FOO", "foo", false, [], []
+    parser.input_tokens.push test_token
+    parser.shift
+    assert_equal [test_token], parser.parser_stack, "Shift did not happen as we expected."
+  end
+  def test_multiple_shift
+    parser = Steve::Parser.new [], []
+    token_1 = Steve::Token.new "FOO", "foo", false, [], []
+    token_2 = Steve::Token.new "BAR", "bar", false, [], []
+    parser.input_tokens.push token_1
+    parser.shift
+    parser.input_tokens.push token_2
+    parser.shift
+    assert_equal [
+      token_1,
+      token_2
+    ], parser.parser_stack, "Shift did not happen as we expected, parser stack needs to stay in correct order."
+  end
   def test_reduce
-    symbol = mock
-    symbol.stubs(:components).returns([["BAR","BAR"]])
-    symbol.stubs(:recursive_components).returns([[]])
-    symbol.stubs(:name).returns("GROUP")
-    symbol.stubs(:root?).returns(true)
-    parser = Steve::Parser.new([symbol])
-    parser.input_tokens = [
-      { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false }
+    parser = Steve::Parser.new [], []
+
+    token_1 = Steve::Token.new "FOO", "foo", false, [], []
+    token_2 = Steve::Token.new "FOO", "foo", false, [], []
+
+    root_token = Steve::Token.new "ROOT", [
+      token_1,
+      token_2
+    ], true, [], []
+
+    parser.parser_stack = [
+      token_1,
+      token_2
     ]
-    assert_equal [
-      { "name" => "GROUP", "value" => [
-        { "name" => "BAR", "value" => "bar", "root" => false },
-        { "name" => "BAR", "value" => "bar", "root" => false }
-      ], "root" => true }
-    ], parser.reduce, "Reduction did not occur properly."
+
+    parser.reduce "ROOT", true
+    assert_equal [root_token], parser.input_tokens, "Reduction did not happen as we expected."
   end
-  def test_more_complex_reduce
+  def test_match
+    symbol_component1 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component2 = Steve::Token.new "BAR", "bar", false, [], []
 
-    root_symbol = mock
-    root_symbol.stubs(:components).returns([["FOO","BAZ"]])
-    root_symbol.stubs(:recursive_components).returns([[]])
-    root_symbol.stubs(:name).returns("ROOT")
-    root_symbol.stubs(:root?).returns(true)
+    symbol = Steve::Token.new "GROUP", "", true, [symbol_component1,symbol_component2], []
 
-    mid_symbol_1 = mock
-    mid_symbol_1.stubs(:components).returns([["BAR","BAR","BAR"]])
-    mid_symbol_1.stubs(:recursive_components).returns([[]])
-    mid_symbol_1.stubs(:name).returns("FOO")
-    mid_symbol_1.stubs(:root?).returns(false)
+    token1 = Steve::Token.new "BAR", "bar", false, [], []
+    token2 = Steve::Token.new "BAR", "bar", false, [], []
 
-    mid_symbol_2 = mock
-    mid_symbol_2.stubs(:components).returns([["FIZZ","BUZZ","FIZZ"]])
-    mid_symbol_2.stubs(:recursive_components).returns([[]])
-    mid_symbol_2.stubs(:name).returns("BAZ")
-    mid_symbol_2.stubs(:root?).returns(false)
-
-    term_symbol_1 = mock
-    term_symbol_1.stubs(:components).returns([[]])
-    term_symbol_1.stubs(:recursive_components).returns([[]])
-    term_symbol_1.stubs(:name).returns("BAR")
-    term_symbol_1.stubs(:root?).returns(false)
-
-    term_symbol_2 = mock
-    term_symbol_2.stubs(:components).returns([[]])
-    term_symbol_2.stubs(:recursive_components).returns([[]])
-    term_symbol_2.stubs(:name).returns("FIZZ")
-    term_symbol_2.stubs(:root?).returns(false)
-
-    term_symbol_3 = mock
-    term_symbol_3.stubs(:components).returns([[]])
-    term_symbol_3.stubs(:recursive_components).returns([[]])
-    term_symbol_3.stubs(:name).returns("BUZZ")
-    term_symbol_3.stubs(:root?).returns(false)
-
-    parser = Steve::Parser.new([root_symbol,mid_symbol_1,mid_symbol_2,term_symbol_1,term_symbol_2,term_symbol_3])
-    parser.input_tokens = [
-      { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "FIZZ", "value" => "fizz", "root" => false },
-      { "name" => "BUZZ", "value" => "buzz", "root" => false },
-      { "name" => "FIZZ", "value" => "fizz", "root" => false }
+    parser_stack = [
+      token1,
+      token2
     ]
-    assert_equal [
-      { "name" => "ROOT", "value" => [
-        { "name" => "FOO", "value" => [
-          { "name" => "BAR", "value" => "bar", "root" => false },
-          { "name" => "BAR", "value" => "bar", "root" => false },
-          { "name" => "BAR", "value" => "bar", "root" => false }
-        ], "root" => false },
-        { "name" => "BAZ", "value" => [
-          { "name" => "FIZZ", "value" => "fizz", "root" => false },
-          { "name" => "BUZZ", "value" => "buzz", "root" => false },
-          { "name" => "FIZZ", "value" => "fizz", "root" => false }
-        ], "root" => false }
-      ], "root" => true }
-    ], parser.reduce, "Reduction did not occur properly."
+
+    parser = Steve::Parser.new [symbol], []
+
+    assert_equal symbol, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
   end
-  def test_recursive_reduce
+  def test_another_match
+    symbol_component1 = Steve::Token.new "BAZ", "baz", false, [], []
+    symbol_component2 = Steve::Token.new "BAZ", "baz", false, [], []
+    symbol_component3 = Steve::Token.new "BAZ", "baz", false, [], []
 
-    root_symbol = mock
-    root_symbol.stubs(:components).returns([[]])
-    root_symbol.stubs(:recursive_components).returns([["FOO"]])
-    root_symbol.stubs(:name).returns("ROOT")
-    root_symbol.stubs(:root?).returns(true)
+    symbol_1 = Steve::Token.new "GROUP", "", false, [symbol_component1,symbol_component2,symbol_component3], []
 
-    recursive_symbol = mock
-    recursive_symbol.stubs(:components).returns([["BAR","BAR"]])
-    recursive_symbol.stubs(:recursive_components).returns([[]])
-    recursive_symbol.stubs(:name).returns("FOO")
-    recursive_symbol.stubs(:root?).returns(false)
+    symbol_component4 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component5 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component6 = Steve::Token.new "FOO", "foo", false, [], []
 
-    non_recursive_symbol = mock
-    non_recursive_symbol.stubs(:components).returns([[]])
-    non_recursive_symbol.stubs(:recursive_components).returns([[]])
-    non_recursive_symbol.stubs(:name).returns("BAR")
-    non_recursive_symbol.stubs(:root?).returns(false)
+    symbol_2 = Steve::Token.new "ROOT", "", true, [symbol_component4,symbol_component5,symbol_component6], []
 
-    parser = Steve::Parser.new([root_symbol,recursive_symbol,non_recursive_symbol])
-    parser.input_tokens = [
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "FOO", "value" => "foo", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false },
-      { "name" => "BAR", "value" => "bar", "root" => false }
+    token1 = Steve::Token.new "BAR", "bar", false, [], []
+    token2 = Steve::Token.new "BAR", "bar", false, [], []
+    token3 = Steve::Token.new "FOO", "foo", false, [], []
+
+    parser_stack = [
+      token1,
+      token2,
+      token3
     ]
-    #assert_equal [
-    #  { "name" => "ROOT", "value" => [
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => "foo", "root" => false },
-    #    { "name" => "FOO", "value" => [
-    #      { "name" => "BAR", "value" => "bar", "root" => false },
-    #      { "name" => "BAR", "value" => "bar", "root" => false }
-    #    ], "root" => false }
-    #  ], "root" => true }
-    #], parser.reduce, "Reduction did not occur properly."
+
+    parser = Steve::Parser.new [symbol_1,symbol_2], []
+
+    assert_equal symbol_2, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
+  end
+  def test_simple_parse
+    symbol_component1 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component2 = Steve::Token.new "BAR", "bar", false, [], []
+
+    symbol = Steve::Token.new "GROUP", "", true, [symbol_component1,symbol_component2], []
+
+    token1 = Steve::Token.new "BAR", "bar", false, [], []
+    token2 = Steve::Token.new "BAR", "bar", false, [], []
+
+    root_token = Steve::Token.new "GROUP", [
+      token1,
+      token2
+    ], true, [], []
+
+    parser = Steve::Parser.new [symbol], [
+      token1,
+      token2
+    ]
+
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
+  end
+  def test_parse_with_lookahead
+    symbol_component1 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component2 = Steve::Token.new "BAR", "bar", false, [], []
+
+    symbol_1 = Steve::Token.new "BARS", "", false, [symbol_component1,symbol_component2], []
+
+    symbol_component3 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component4 = Steve::Token.new "BAR", "bar", false, [], []
+    symbol_component5 = Steve::Token.new "FOO", "foo", false, [], []
+
+    symbol_2 = Steve::Token.new "ROOT", "", true, [symbol_component3,symbol_component4,symbol_component5], []
+
+    token1 = Steve::Token.new "BAR", "bar", false, [], []
+    token2 = Steve::Token.new "BAR", "bar", false, [], []
+    token3 = Steve::Token.new "FOO", "foo", false, [], []
+
+    root_token = Steve::Token.new "ROOT", [
+      token1,
+      token2,
+      token3
+    ], true, [], []
+
+    parser = Steve::Parser.new [symbol_1,symbol_2], [
+      token1,
+      token2,
+      token3
+    ]
+
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
 end
