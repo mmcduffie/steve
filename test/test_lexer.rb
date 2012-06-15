@@ -11,16 +11,16 @@ class LexerTest < Test::Unit::TestCase
   def test_scan
     tokens = @lexer.scan "foo foo bar"
     assert_equal [
-      { "name" => "foo", "value" => "foo", "root" => false },
-      { "name" => "foo", "value" => "foo", "root" => false },
-      { "name" => "bar", "value" => "bar", "root" => false }
+      Steve::Token.new("foo","foo",false,[],[]),
+      Steve::Token.new("foo","foo",false,[],[]),
+      Steve::Token.new("bar","bar",false,[],[])
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_complicated_scan
     tokens = @lexer.scan 'foo "foo bar"'
     assert_equal [
-      { "name" => "foo", "value" => "foo", "root" => false },
-      { "name" => "string", "value" => "\"foo bar\"", "root" => false }
+      Steve::Token.new("foo","foo",false,[],[]),
+      Steve::Token.new("string","\"foo bar\"",false,[],[])
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_single_char_tokens
@@ -31,13 +31,13 @@ class LexerTest < Test::Unit::TestCase
     ])
     tokens = @lexer.scan "[[foo] [ ] ]"
     assert_equal [
-      { "name" => "OPEN_OBJECT",  "value" => "[",   "root" => false },
-      { "name" => "OPEN_OBJECT",  "value" => "[",   "root" => false },
-      { "name" => "foo",          "value" => "foo", "root" => false },
-      { "name" => "CLOSE_OBJECT", "value" => "]",   "root" => false },
-      { "name" => "OPEN_OBJECT",  "value" => "[",   "root" => false },
-      { "name" => "CLOSE_OBJECT", "value" => "]",   "root" => false },
-      { "name" => "CLOSE_OBJECT", "value" => "]",   "root" => false }
+      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
+      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
+      Steve::Token.new("foo","foo",false,[],[]),
+      Steve::Token.new("CLOSE_OBJECT","]",false,[],[]),
+      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
+      Steve::Token.new("CLOSE_OBJECT","]",false,[],[]),
+      Steve::Token.new("CLOSE_OBJECT","]",false,[],[])
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_lexing_error
