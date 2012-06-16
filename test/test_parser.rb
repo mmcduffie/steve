@@ -136,6 +136,7 @@ class ParserTest < Test::Unit::TestCase
 
     assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
+  # Need to add better tests that show parsing recursive rules and regular rules.
   def test_parse_with_recursive_rules
     symbol_component = Steve::Token.new "BAR", "bar", false, [], []
 

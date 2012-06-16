@@ -53,6 +53,9 @@ module Steve
       end
       return false
     end
+    #
+    # This is what the parser returns.
+    #
     def abstract_syntax_tree
       return @input_tokens[0]
     end
