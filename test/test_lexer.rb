@@ -11,16 +11,16 @@ class LexerTest < Test::Unit::TestCase
   def test_scan
     tokens = @lexer.scan "foo foo bar"
     assert_equal [
-      Steve::Token.new("foo","foo",false,[],[]),
-      Steve::Token.new("foo","foo",false,[],[]),
-      Steve::Token.new("bar","bar",false,[],[])
+      Steve::Token.new({ :name => "foo", :value => "foo"}),
+      Steve::Token.new({ :name => "foo", :value => "foo"}),
+      Steve::Token.new({ :name => "bar", :value => "bar"})
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_complicated_scan
     tokens = @lexer.scan 'foo "foo bar"'
     assert_equal [
-      Steve::Token.new("foo","foo",false,[],[]),
-      Steve::Token.new("string","\"foo bar\"",false,[],[])
+      Steve::Token.new({ :name => "foo", :value => "foo"}),
+      Steve::Token.new({ :name => "string", :value => "\"foo bar\""})
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_single_char_tokens
@@ -31,13 +31,13 @@ class LexerTest < Test::Unit::TestCase
     ])
     tokens = @lexer.scan "[[foo] [ ] ]"
     assert_equal [
-      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
-      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
-      Steve::Token.new("foo","foo",false,[],[]),
-      Steve::Token.new("CLOSE_OBJECT","]",false,[],[]),
-      Steve::Token.new("OPEN_OBJECT","[",false,[],[]),
-      Steve::Token.new("CLOSE_OBJECT","]",false,[],[]),
-      Steve::Token.new("CLOSE_OBJECT","]",false,[],[])
+      Steve::Token.new({ :name => "OPEN_OBJECT", :value => "["}),
+      Steve::Token.new({ :name => "OPEN_OBJECT", :value => "["}),
+      Steve::Token.new({ :name => "foo", :value => "foo"}),
+      Steve::Token.new({ :name => "CLOSE_OBJECT", :value => "]"}),
+      Steve::Token.new({ :name => "OPEN_OBJECT", :value => "["}),
+      Steve::Token.new({ :name => "CLOSE_OBJECT", :value => "]"}),
+      Steve::Token.new({ :name => "CLOSE_OBJECT", :value => "]"})
     ], tokens, "Token array returned from scan is not what we expected."
   end
   def test_lexing_error

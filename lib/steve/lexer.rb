@@ -27,7 +27,7 @@ module Steve
       @definitions.each do |definition|
         match_status = definition["regex"] =~ test_string #we get result of match as number so we can make sure it's exact
         if match_status == 0 #see if our test string matches a definition
-          @result_stack.push(Steve::Token.new(definition["name"],test_string,false,[],[]))
+          @result_stack.push(Steve::Token.new({ :name => definition["name"], :value => test_string}))
           #if it does, it should be returned as a token
           @lexer_stack = [] #reset stack
         end

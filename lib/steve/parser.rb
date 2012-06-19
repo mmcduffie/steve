@@ -17,7 +17,7 @@ module Steve
       end
     end
     def reduce(name,root)
-      reduced_token = Steve::Token.new name, @parser_stack, root, [], []
+      reduced_token = Steve::Token.new({ :name => name, :value => @parser_stack, :root => root })
       @parser_stack = []
       @input_tokens.push reduced_token
     end
@@ -45,14 +45,6 @@ module Steve
       end
       return lookahead_match
     end
-    def recursive_component
-      @grammar_rules.each do |rule|
-        if @parser_stack.last == rule.recursive_components[0]
-          return rule
-        end
-      end
-      return false
-    end
     #
     # This is what the parser returns.
     #
@@ -67,22 +59,10 @@ module Steve
         return abstract_syntax_tree
       end
       shift
-      @recursive_token = recursive_component
-      if recursive_component
-        @recursive_mode = true
-      end
-      if @recursive_mode
-        if @recursive_token
-          if @lookahead_token != @recursive_token || @input_tokens.empty?
-            reduce @recursive_token.name, @recursive_token.root
-          end
-        end
-      else
-        match = match @parser_stack
-        if match
-          unless lookahead_match?
-            reduce match.name, match.root
-          end
+      match = match @parser_stack
+      if match
+        unless lookahead_match?
+          reduce match.name, match.root
         end
       end
       parse

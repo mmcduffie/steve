@@ -4,13 +4,13 @@ module Steve
     attr_accessor :value
     attr_accessor :root
     attr_accessor :components
-    attr_accessor :recursive_components
-    def initialize(name,value,root,components,recursive_components)
-      @name                 = name
-      @value                = value
-      @root                 = root
-      @components           = components
-      @recursive_components = recursive_components
+    attr_accessor :multiples
+    def initialize(options = {})
+      @name       = options[:name]       || "NULL"
+      @value      = options[:value]      || "NULL"
+      @root       = options[:root]       || false
+      @components = options[:components] || []
+      @multiples  = options[:multiples]  || false
     end
     def ==(comparison_token)
       if comparison_token.respond_to?('name')
