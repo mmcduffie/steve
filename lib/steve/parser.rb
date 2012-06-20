@@ -23,11 +23,26 @@ module Steve
     end
     def match(stack)
       @grammar_rules.each do |rule|
+        multiple_tokens = []
+        rule.components.each do |component|
+          multiple_tokens.push component if component.multiples
+        end
+        #stack = purge_duplicates stack, multiple_tokens
         if stack == rule.components
           return rule
         end
       end
       return false
+    end
+    def purge_duplicates(stack,multiple_tokens)
+
+      # 1.) loop through entire stack seeing if current token matches the next one and one in the multiple_tokens list.
+      # 2.) if no current token matches the next one and one in the multiple_tokens list, return.
+      # 3.) loop through entire stack seeing if current token matches the next one and one in the multiple_tokens list.
+      # 4.) if a the token matches the next one and one in the multiple_tokens list, remove that token. 
+      # 5.) call this method again.
+
+      return stack
     end
     def finished?
       if @input_tokens.length == 1 && @input_tokens[0].root
