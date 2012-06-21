@@ -5,11 +5,15 @@ module Steve
     attr_accessor :recursive_mode
     attr_accessor :lookahead_token
     attr_accessor :recursive_token
+    attr_accessor :working_stack
+    attr_accessor :token_count
     def initialize(grammar_rules,input_tokens)
       @grammar_rules = grammar_rules
       @input_tokens = input_tokens.reverse!
       @parser_stack = []
       @recursive_mode = false
+      @working_stack = []
+      @token_count = 0
     end
     def shift
       unless @input_tokens.empty?
@@ -27,22 +31,36 @@ module Steve
         rule.components.each do |component|
           multiple_tokens.push component if component.multiples
         end
-        #stack = purge_duplicates stack, multiple_tokens
+        multiple_tokens.each do |multiple_token|
+          stack = purge_duplicates stack, multiple_token
+        end
         if stack == rule.components
           return rule
         end
       end
       return false
     end
-    def purge_duplicates(stack,multiple_tokens)
-
-      # 1.) loop through entire stack seeing if current token matches the next one and one in the multiple_tokens list.
-      # 2.) if no current token matches the next one and one in the multiple_tokens list, return.
-      # 3.) loop through entire stack seeing if current token matches the next one and one in the multiple_tokens list.
-      # 4.) if a the token matches the next one and one in the multiple_tokens list, remove that token. 
-      # 5.) call this method again.
-
-      return stack
+    def purge_duplicates(stack,multiple_token)
+      @token_count = 0
+      stack.each do |token|
+        if token == multiple_token
+          @token_count = @token_count + 1
+        end
+      end
+      if @token_count == 0
+        if stack.length > 0
+          @working_stack.push stack.shift
+        end
+        stack = @working_stack
+        @working_stack = []
+        return stack
+      end
+      if stack.first == @working_stack.last && stack.first == multiple_token
+        stack.shift
+      else
+        @working_stack.push stack.shift
+      end
+      purge_duplicates(stack,multiple_token)
     end
     def finished?
       if @input_tokens.length == 1 && @input_tokens[0].root

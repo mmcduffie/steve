@@ -134,15 +134,12 @@ class ParserTest < Test::Unit::TestCase
     stack = [token1,token2,token3,token4,token5]
     
     multiple_token1 = Steve::Token.new({ :name => "BAR", :value => "bar", :multiples => true })
-    multiple_token2 = Steve::Token.new({ :name => "FOO", :value => "foo", :multiples => true })
-
-    multiple_tokens = [multiple_token1,multiple_token2]
 
     parser = Steve::Parser.new [], []
 
     comparison_stack = [token1,token2,token5]
 
-    assert_equal comparison_stack, parser.purge_duplicates(stack,multiple_tokens), "Duplicates not removed."
+    assert_equal comparison_stack, parser.purge_duplicates(stack,multiple_token1), "Duplicates not removed."
   end
   def test_parse_with_recursive_rules
     symbol_component = Steve::Token.new({ :name => "BAR", :value => "bar" , :multiples => true })
@@ -160,6 +157,35 @@ class ParserTest < Test::Unit::TestCase
       token,
       token
     ]
+
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
+  end
+  def test_more_complex_parse_with_recursive_rules
+    symbol_component1 = Steve::Token.new({ :name => "OPEN" , :value => "["   , :multiples => false })
+    symbol_component2 = Steve::Token.new({ :name => "BAR"  , :value => "bar" , :multiples => true  })
+    symbol_component3 = Steve::Token.new({ :name => "CLOSE", :value => "]"   , :multiples => false })
+
+    symbol = Steve::Token.new({ :name => "ROOT", :root => true })
+    symbol.components = [symbol_component1,symbol_component2,symbol_component3]
+
+    token1 = Steve::Token.new({ :name => "OPEN" , :value => "["   })
+    token2 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
+    token3 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
+    token4 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
+    token5 = Steve::Token.new({ :name => "CLOSE", :value => "]"   })
+
+    root_token = Steve::Token.new({ :name => "ROOT", :root => true })
+    root_token.value = [token1,token2,token3,token4,token5]
+
+    parser = Steve::Parser.new [symbol], [
+      token1,
+      token2,
+      token3,
+      token4,
+      token5
+    ]
+ 
+    # NOT WORKING YET    
 
     #assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
