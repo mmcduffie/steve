@@ -6,7 +6,7 @@ class ParserTest < Test::Unit::TestCase
     test_token = Steve::Token.new({ :name => "FOO", :value => "foo" })
     parser.input_tokens.push test_token
     parser.shift
-    #assert_equal [test_token], parser.parser_stack, "Shift did not happen as we expected."
+    assert_equal [test_token], parser.parser_stack, "Shift did not happen as we expected."
   end
   def test_multiple_shift
     parser = Steve::Parser.new [], []
@@ -16,10 +16,10 @@ class ParserTest < Test::Unit::TestCase
     parser.shift
     parser.input_tokens.push token_2
     parser.shift
-    #assert_equal [
-    #  token_1,
-    #  token_2
-    #], parser.parser_stack, "Shift did not happen as we expected, parser stack needs to stay in correct order."
+    assert_equal [
+      token_1,
+      token_2
+    ], parser.parser_stack, "Shift did not happen as we expected, parser stack needs to stay in correct order."
   end
   def test_reduce
     parser = Steve::Parser.new [], []
@@ -34,7 +34,7 @@ class ParserTest < Test::Unit::TestCase
     parser.parser_stack = [token_1,token_2]
 
     parser.reduce "ROOT", true
-    #assert_equal [root_token], parser.input_tokens, "Reduction did not happen as we expected."
+    assert_equal [root_token], parser.input_tokens, "Reduction did not happen as we expected."
   end
   def test_match
     symbol_component1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -51,7 +51,7 @@ class ParserTest < Test::Unit::TestCase
 
     parser = Steve::Parser.new [symbol], []
 
-    #assert_equal symbol, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
+    assert_equal symbol, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
   end
   def test_another_match
     symbol_component1 = Steve::Token.new({ :name => "BAZ", :value => "baz" })
@@ -76,7 +76,7 @@ class ParserTest < Test::Unit::TestCase
 
     parser = Steve::Parser.new [symbol_1,symbol_2], []
 
-    #assert_equal symbol_2, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
+    assert_equal symbol_2, parser.match(parser_stack), "Match did not return the name of the matching non-terminal."
   end
   def test_simple_parse
     symbol_component1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -93,7 +93,7 @@ class ParserTest < Test::Unit::TestCase
 
     parser = Steve::Parser.new [symbol], [token1,token2]
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
   def test_parse_with_lookahead
     symbol_component1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -122,7 +122,7 @@ class ParserTest < Test::Unit::TestCase
       token3
     ]
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
   def test_purge_duplicates
     token1 = Steve::Token.new({ :name => "OPEN" , :value => "["   })
@@ -184,9 +184,7 @@ class ParserTest < Test::Unit::TestCase
       token4,
       token5
     ]
- 
-    # NOT WORKING YET    
 
-    #assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
   end
 end

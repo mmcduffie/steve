@@ -26,15 +26,16 @@ module Steve
       @input_tokens.push reduced_token
     end
     def match(stack)
+      stack_copy = Array.new(stack.length) { |index| stack[index] }
       @grammar_rules.each do |rule|
         multiple_tokens = []
         rule.components.each do |component|
           multiple_tokens.push component if component.multiples
         end
         multiple_tokens.each do |multiple_token|
-          stack = purge_duplicates stack, multiple_token
+          stack_copy = purge_duplicates stack_copy, multiple_token
         end
-        if stack == rule.components
+        if stack_copy == rule.components
           return rule
         end
       end
