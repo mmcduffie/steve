@@ -40,9 +40,8 @@ class ParserTest < Test::Unit::TestCase
     symbol_component1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     symbol_component2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
 
-    symbol = Steve::Token.new({ :name => "GROUP" })
-    symbol.root = true
-    symbol.components = [symbol_component1,symbol_component2]
+    symbol = Steve::Token.new({ :name => "GROUP", :root => true })
+    symbol.rules = [[symbol_component1,symbol_component2]]
 
     token1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     token2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -59,14 +58,14 @@ class ParserTest < Test::Unit::TestCase
     symbol_component3 = Steve::Token.new({ :name => "BAZ", :value => "baz" })
 
     symbol_1 = Steve::Token.new({ :name => "GROUP", :root => false })
-    symbol_1.components = [symbol_component1,symbol_component2,symbol_component3]
+    symbol_1.rules = [[symbol_component1,symbol_component2,symbol_component3]]
 
     symbol_component4 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     symbol_component5 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     symbol_component6 = Steve::Token.new({ :name => "FOO", :value => "foo" })
 
     symbol_2 = Steve::Token.new({ :name => "ROOT", :root => true })
-    symbol_2.components = [symbol_component4,symbol_component5,symbol_component6]
+    symbol_2.rules = [[symbol_component4,symbol_component5,symbol_component6]]
 
     token1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     token2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -83,7 +82,7 @@ class ParserTest < Test::Unit::TestCase
     symbol_component2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
 
     symbol = Steve::Token.new({ :name => "GROUP", :root => true })
-    symbol.components = [symbol_component1,symbol_component2]
+    symbol.rules = [[symbol_component1,symbol_component2]]
 
     token1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     token2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -100,14 +99,14 @@ class ParserTest < Test::Unit::TestCase
     symbol_component2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
 
     symbol_1 = Steve::Token.new({ :name => "BARS", :root => false })
-    symbol_1.components = [symbol_component1,symbol_component2]
+    symbol_1.rules = [[symbol_component1,symbol_component2]]
 
     symbol_component3 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     symbol_component4 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     symbol_component5 = Steve::Token.new({ :name => "FOO", :value => "foo" })
 
     symbol_2 = Steve::Token.new({ :name => "ROOT", :root => true })
-    symbol_2.components = [symbol_component3,symbol_component4,symbol_component5]
+    symbol_2.rules = [[symbol_component3,symbol_component4,symbol_component5]]
 
     token1 = Steve::Token.new({ :name => "BAR", :value => "bar" })
     token2 = Steve::Token.new({ :name => "BAR", :value => "bar" })
@@ -145,7 +144,7 @@ class ParserTest < Test::Unit::TestCase
     symbol_component = Steve::Token.new({ :name => "BAR", :value => "bar" , :multiples => true })
 
     symbol = Steve::Token.new({ :name => "ROOT", :root => true })
-    symbol.components = [symbol_component]
+    symbol.rules = [[symbol_component]]
 
     token = Steve::Token.new({ :name => "BAR", :value => "bar" })
 
@@ -166,13 +165,45 @@ class ParserTest < Test::Unit::TestCase
     symbol_component3 = Steve::Token.new({ :name => "CLOSE", :value => "]"   , :multiples => false })
 
     symbol = Steve::Token.new({ :name => "ROOT", :root => true })
-    symbol.components = [symbol_component1,symbol_component2,symbol_component3]
+    symbol.rules = [[symbol_component1,symbol_component2,symbol_component3]]
 
     token1 = Steve::Token.new({ :name => "OPEN" , :value => "["   })
     token2 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
     token3 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
     token4 = Steve::Token.new({ :name => "BAR"  , :value => "bar" })
     token5 = Steve::Token.new({ :name => "CLOSE", :value => "]"   })
+
+    root_token = Steve::Token.new({ :name => "ROOT", :root => true })
+    root_token.value = [token1,token2,token3,token4,token5]
+
+    parser = Steve::Parser.new [symbol], [
+      token1,
+      token2,
+      token3,
+      token4,
+      token5
+    ]
+
+    assert_equal root_token, parser.parse, "Parse did not occur properly."
+  end
+  def test_really_complex_parse
+    symbol_component1 = Steve::Token.new({ :name => "OPEN" , :value => "["   , :multiples => false })
+    symbol_component2 = Steve::Token.new({ :name => "BAR"  , :value => "bar" , :multiples => true  })
+    symbol_component3 = Steve::Token.new({ :name => "CLOSE", :value => "]"   , :multiples => false })
+
+    symbol_component4 = Steve::Token.new({ :name => "OPEN_FOO" , :value => "("   , :multiples => false })
+    symbol_component5 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" , :multiples => true  })
+    symbol_component6 = Steve::Token.new({ :name => "CLOSE_FOO", :value => ")"   , :multiples => false })
+
+    symbol = Steve::Token.new({ :name => "ROOT", :root => true })
+    symbol.rules = [[symbol_component1,symbol_component2,symbol_component3],
+                    [symbol_component4,symbol_component5,symbol_component6]]
+
+    token1 = Steve::Token.new({ :name => "OPEN_FOO" , :value => "("   })
+    token2 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
+    token3 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
+    token4 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
+    token5 = Steve::Token.new({ :name => "CLOSE_FOO", :value => ")"   })
 
     root_token = Steve::Token.new({ :name => "ROOT", :root => true })
     root_token.value = [token1,token2,token3,token4,token5]
