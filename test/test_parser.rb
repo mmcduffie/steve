@@ -195,20 +195,30 @@ class ParserTest < Test::Unit::TestCase
     symbol_component5 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" , :multiples => true  })
     symbol_component6 = Steve::Token.new({ :name => "CLOSE_FOO", :value => ")"   , :multiples => false })
 
-    symbol = Steve::Token.new({ :name => "ROOT", :root => true })
-    symbol.rules = [[symbol_component1,symbol_component2,symbol_component3],
-                    [symbol_component4,symbol_component5,symbol_component6]]
-
     token1 = Steve::Token.new({ :name => "OPEN_FOO" , :value => "("   })
     token2 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
     token3 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
     token4 = Steve::Token.new({ :name => "FOO" ,      :value => "foo" })
     token5 = Steve::Token.new({ :name => "CLOSE_FOO", :value => ")"   })
 
-    root_token = Steve::Token.new({ :name => "ROOT", :root => true })
-    root_token.value = [token1,token2,token3,token4,token5]
+    child_symbol = Steve::Token.new({ :name => "FOOSORBARS", :multiples => true, :root => false })
+    child_symbol.rules = [[symbol_component1,symbol_component2,symbol_component3],
+                          [symbol_component4,symbol_component5,symbol_component6]]
+    child_symbol.value = [
+        token1,
+        token2,
+        token3,
+        token4,
+        token5
+    ]
 
-    parser = Steve::Parser.new [symbol], [
+    root_symbol = Steve::Token.new({ :name => "ROOT", :root => true })
+    root_symbol.rules = [[child_symbol]]
+
+    root_token = Steve::Token.new({ :name => "ROOT", :root => true })
+    root_token.value = [child_symbol]
+
+    parser = Steve::Parser.new [root_symbol,child_symbol], [
       token1,
       token2,
       token3,
@@ -216,6 +226,6 @@ class ParserTest < Test::Unit::TestCase
       token5
     ]
 
-    assert_equal root_token, parser.parse, "Parse did not occur properly."
+    assert_equal root_token.value[0].name, parser.parse.value[0].name, "Parse did not occur properly."
   end
 end
