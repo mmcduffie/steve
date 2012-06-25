@@ -13,6 +13,7 @@ module Steve
   autoload :MathExpression, "steve/math_expression"
   autoload :Object, "steve/object"
   autoload :Slot, "steve/object"
+  autoload :EBNFParser, "steve/ebnf_parser"
 
   # This is the main exec for Steve. This should get called weather we
   # are invoking Steve from the command line after insalling as a gem or 

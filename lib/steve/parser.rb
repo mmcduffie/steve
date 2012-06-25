@@ -2,16 +2,12 @@ module Steve
   class Parser
     attr_accessor :parser_stack
     attr_accessor :input_tokens
-    attr_accessor :recursive_mode
-    attr_accessor :lookahead_token
-    attr_accessor :recursive_token
     attr_accessor :working_stack
     attr_accessor :token_count
     def initialize(grammar_rules,input_tokens)
       @grammar_rules = grammar_rules
       @input_tokens = input_tokens.reverse!
       @parser_stack = []
-      @recursive_mode = false
       @working_stack = []
       @token_count = 0
     end
@@ -81,8 +77,8 @@ module Steve
     def lookahead_match?
       lookahead_match = false
       unless @input_tokens.empty?
-        @lookahead_token = @input_tokens.last
-        lookahead_stack = @parser_stack + [@lookahead_token]
+        lookahead_token = @input_tokens.last
+        lookahead_stack = @parser_stack + [lookahead_token]
         lookahead_match = match lookahead_stack
       end
       return lookahead_match
