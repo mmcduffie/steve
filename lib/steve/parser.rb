@@ -1,6 +1,7 @@
 module Steve
   class Parser
     attr_accessor :parser_stack
+    attr_accessor :grammar_rules
     attr_accessor :input_tokens
     attr_accessor :working_stack
     attr_accessor :token_count
