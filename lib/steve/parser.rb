@@ -119,5 +119,24 @@ module Steve
       end
       parse
     end
+    #
+    # The debug_parse method is only a utility function that
+    # isn't used with production code.
+    #
+    def debug_parse(loop_count)
+      loop_count.times do
+        print_status
+        if finished?
+          return abstract_syntax_tree
+        end
+        shift
+        match = match @parser_stack
+        if match
+          unless lookahead_match?
+            reduce match.name, match.root
+          end
+        end
+      end
+    end
   end
 end
