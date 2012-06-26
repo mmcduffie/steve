@@ -7,14 +7,14 @@ module Steve
     attr_accessor :token_count
     def initialize(grammar_rules,input_tokens)
       @grammar_rules = grammar_rules
-      @input_tokens = input_tokens.reverse!
+      @input_tokens = input_tokens
       @parser_stack = []
       @working_stack = []
       @token_count = 0
     end
     def shift
       unless @input_tokens.empty?
-        @parser_stack.push @input_tokens.pop
+        @parser_stack.push @input_tokens.shift
       end
     end
     def reduce(name,root)
@@ -83,6 +83,19 @@ module Steve
         lookahead_match = match lookahead_stack
       end
       return lookahead_match
+    end
+    def print_status
+      print "\n"
+      print "PARSER_STACK: "
+      @parser_stack.each do |token|
+        print "#{token.name} " 
+      end
+      print "\n"
+      print "INPUT_TOKENS: "
+      @input_tokens.each do |token|
+        print "#{token.name} " 
+      end
+      print "\n"
     end
     #
     # This is what the parser returns.

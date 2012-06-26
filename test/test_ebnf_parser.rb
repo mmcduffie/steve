@@ -14,5 +14,7 @@ class EBNFParserTest < Test::Unit::TestCase
     token5 = Steve::Token.new({ :name => "STRING",            :value => "STRING" })
     token6 = Steve::Token.new({ :name => "END_RULES",         :value => ";" })
     parser.input_tokens = [token1,token2,token3,token4,token5,token6]
+
+    assert_equal "GRAMMAR", parser.parse.name, "Parser should have reduced to a single token called GRAMMAR"
   end
 end
